@@ -13,7 +13,7 @@ class EOCVPipeline
 public:
     EOCVPipeline() {}
 
-    virtual cv::Mat processFrame(cv::Mat& input)
+    virtual cv::Mat processFrame(cv::Mat input)
     {
         input.copyTo(output);
         return output;

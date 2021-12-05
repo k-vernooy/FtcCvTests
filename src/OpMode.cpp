@@ -14,6 +14,8 @@ int main(int argc, char** argv)
     assert(argc > 1);
     EOCVCamera cam;
 
+    // TODO: looping image input srcs
+
     try
     {
         cam = EOCVCamera(std::stoi(argv[1]));
