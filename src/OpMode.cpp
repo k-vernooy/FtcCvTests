@@ -3,7 +3,7 @@
 #include <string>
 
 #include "EOCVDummy.h"
-#include "BarcodePipeline.h"
+#include "Pipelines/BarcodePipeline.h"
 
 
 int main(int argc, char** argv)

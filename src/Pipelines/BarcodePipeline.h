@@ -1,4 +1,4 @@
-#include "EOCVDummy.h"
+#include "../EOCVDummy.h"
 
 
 class BarcodePipeline : public EOCVPipeline
@@ -6,7 +6,7 @@ class BarcodePipeline : public EOCVPipeline
 public:    
     BarcodePipeline() {name = "Barcode Pipeline";}
  
-    cv::Mat processFrame(cv::Mat input) override
+    cv::Mat processFrame(cv::Mat input)
     {
         const cv::Rect ImageCrop = cv::Rect(220, 120, 500, 230);
 
@@ -30,7 +30,8 @@ public:
         std::cout << contours.size() << std::endl;
 
         //Draw the output
-        cv::Mat contourImage(output.size(), CV_8UC3, cv::Scalar(0,0,0));
+        cv::Mat contourImage; //(output.size(), CV_8UC3, cv::Scalar(0,0,0));
+        input.copyTo(contourImage);
         
         cv::Scalar colors[3];
         colors[0] = cv::Scalar(255, 0, 0);
@@ -38,14 +39,15 @@ public:
         colors[2] = cv::Scalar(0, 0, 255);
 
         for (size_t idx = 0; idx < contours.size(); idx++) {
+            for (cv::Point& p : contours[idx])
+            {
+                p.x += ImageCrop.x;
+                p.y += ImageCrop.y;
+            }
             // if (contours[idx].size() < 10)
             cv::drawContours(contourImage, contours, idx, colors[idx % 3]);
         }
         
-        
-        // cv::GaussianBlur(output, output, cv::Size(1, 7), 0);
-        // cv::Laplacian(output, output, CV_16S, 3);
-        // return output;
         return contourImage;
     }
 };
