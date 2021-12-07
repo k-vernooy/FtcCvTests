@@ -41,7 +41,6 @@ public:
     void startStreaming()
     {
         open();
-        // cv::namedWindow(pipeline->getName(), cv::WINDOW_AUTOSIZE);
         assert(cap.isOpened());
         captureFrame(frame);
 

@@ -9,53 +9,73 @@ public:
     cv::Mat processFrame(cv::Mat input)
     {
         // const cv::Rect ImageCrop = cv::Rect(220, 120, 500, 230);
-        input.copyTo(output);
-        // output = input(ImageCrop);
-        cv::cvtColor(output, output, cv::COLOR_BGR2GRAY);
-        cv::GaussianBlur(output, output, cv::Size(7, 7), 5);
-        // cv::threshold(output, output, 120, 255, cv::THRESH_BINARY);
+        // input = input(ImageCrop);
 
-        // cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 5);
+        cv::Mat hsv;
 
-        // cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 4);
-        cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 4);
+        cv::cvtColor(input, hsv, cv::COLOR_BGR2HSV);
+        cv::GaussianBlur(hsv, hsv, cv::Size(7, 7), 5);
+        
+        cv::Mat yellowRegions, redRegions;
 
-        cv::GaussianBlur(output, output, cv::Size(65, 65), 9);
-        cv::threshold(output, output, 30, 255, cv::THRESH_BINARY);
-
-        // return output;
-        // cv::
+        cv::inRange(hsv, cv::Scalar(15, 80, 80), cv::Scalar(40, 255, 255), yellowRegions);
+        cv::morphologyEx(yellowRegions, yellowRegions, cv::MORPH_CLOSE, cv::Mat::ones(cv::Size(25, 25), CV_32F));
+        cv::morphologyEx(yellowRegions, yellowRegions, cv::MORPH_OPEN, cv::Mat::ones(cv::Size(15, 15), CV_32F));
+        
+        cv::inRange(hsv, cv::Scalar(120, 80, 80), cv::Scalar(180, 255, 255), redRegions);
+        cv::morphologyEx(redRegions, redRegions, cv::MORPH_CLOSE, cv::Mat::ones(cv::Size(25, 25), CV_32F));
+        cv::morphologyEx(redRegions, redRegions, cv::MORPH_OPEN, cv::Mat::ones(cv::Size(15, 15), CV_32F));
+        
 
         // cv::findContours(output, output, )
 
-        std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(output, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+        // return output;
+        // cv::Mat labels, stats, centroids;
+        // int ncomponents = cv::connectedComponentsWithStats(yellowRegions, labels, stats, centroids, 8);
+        // cv::Mat result = cv::Mat(labels.size(), CV_8U, cv::Scalar(0));
 
-        std::cout << contours.size() << std::endl;
+        // for (int i = 1; i < ncomponents; i++) {
+        //     cv::Mat interm;
+        //     // find the dimensions of the current component
+            
+        //     cv::Point2d centroid(centroids.at<double>(i, 0), centroids.at<double>(i, 1));
+        // }
 
-        //Draw the output
-        cv::Mat contourImage; //(output.size(), CV_8UC3, cv::Scalar(0,0,0));
-        input.copyTo(contourImage);
-
-        cv::Mat result = cv::Mat::zeros(input.size(), input.type());
         
-        for (size_t idx = 0; idx < contours.size(); idx++)
-        {
-            cv::Mat mask = cv::Mat::zeros(input.size(), CV_8U);
+        std::vector<std::vector<cv::Point>> redContours;
+        std::vector<std::vector<cv::Point>> yellowContours;
+        cv::findContours(redRegions, redContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
+        cv::findContours(yellowRegions, yellowContours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 
-            // for (cv::Point& p : contours[idx])
-            // {
-            //     p.x += ImageCrop.x;
-            //     p.y += ImageCrop.y;
-            // }
+        cv::Mat yResult;
+        input.copyTo(yResult, yellowRegions);
+        
 
-            cv::drawContours(mask, contours, idx, cv::Scalar(255), -1);
-            // cv::drawContours(contourImage, contours, idx, cv::Scalar(255));
-            // input.copyTo(maskedInput, mask);
-            cv::bitwise_or(input, result, result, mask);
-            // return maskedInput;
-        }
+        cv::Mat rResult;
+        input.copyTo(rResult, redRegions);
+        cv::Mat result;
+
+        cv::bitwise_or(rResult, yResult, result);
+
+        // for (size_t idx = 0; idx < redContours.size(); idx++)
+        // {
+        //     // cv::Mat mask = cv::Mat::zeros(input.size(), CV_8U);
+
+        //     // for (cv::Point& p : contours[idx])
+        //     // {
+        //     //     p.x += ImageCrop.x;
+        //     //     p.y += ImageCrop.y;
+        //     // }
+
+        //     cv::drawContours(result, redContours, idx, cv::Scalar(0, 0, 255), 6);
+        //     // cv::drawContours(contourImage, contours, idx, cv::Scalar(255));
+        //     // input.copyTo(maskedInput, mask);
+        //     // cv::bitwise_or(input, result, result, mask);
+        //     // return maskedInput;
+        // }
+        
         
         return result;
+        // return result;
     }
 };

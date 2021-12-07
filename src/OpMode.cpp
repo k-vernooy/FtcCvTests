@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     }
 
     // Attach a processing pipeline to the camera
-    EOCVPipeline* pipeline = new PositioningPipeline();
+    EOCVPipeline* pipeline = new BarcodePipeline();
     cam.setPipeline(pipeline);
 
     // Constantly apply pipeline to incoming frames and display the result
