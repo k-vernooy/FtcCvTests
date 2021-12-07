@@ -8,18 +8,22 @@ public:
  
     cv::Mat processFrame(cv::Mat input)
     {
-        const cv::Rect ImageCrop = cv::Rect(220, 120, 500, 230);
-
-        output = input(ImageCrop);
+        // const cv::Rect ImageCrop = cv::Rect(220, 120, 500, 230);
+        input.copyTo(output);
+        // output = input(ImageCrop);
         cv::cvtColor(output, output, cv::COLOR_BGR2GRAY);
         cv::GaussianBlur(output, output, cv::Size(7, 7), 5);
         // cv::threshold(output, output, 120, 255, cv::THRESH_BINARY);
 
-        cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 5);
-        cv::GaussianBlur(output, output, cv::Size(55, 55), 5);
-        cv::threshold(output, output, 40, 255, cv::THRESH_BINARY);
+        // cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 5);
 
-        // cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 3);
+        // cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 4);
+        cv::adaptiveThreshold(output, output, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY_INV, 25, 4);
+
+        cv::GaussianBlur(output, output, cv::Size(65, 65), 9);
+        cv::threshold(output, output, 30, 255, cv::THRESH_BINARY);
+
+        // return output;
         // cv::
 
         // cv::findContours(output, output, )
@@ -32,22 +36,26 @@ public:
         //Draw the output
         cv::Mat contourImage; //(output.size(), CV_8UC3, cv::Scalar(0,0,0));
         input.copyTo(contourImage);
-        
-        cv::Scalar colors[3];
-        colors[0] = cv::Scalar(255, 0, 0);
-        colors[1] = cv::Scalar(0, 255, 0);
-        colors[2] = cv::Scalar(0, 0, 255);
 
-        for (size_t idx = 0; idx < contours.size(); idx++) {
-            for (cv::Point& p : contours[idx])
-            {
-                p.x += ImageCrop.x;
-                p.y += ImageCrop.y;
-            }
-            // if (contours[idx].size() < 10)
-            cv::drawContours(contourImage, contours, idx, colors[idx % 3]);
+        cv::Mat result = cv::Mat::zeros(input.size(), input.type());
+        
+        for (size_t idx = 0; idx < contours.size(); idx++)
+        {
+            cv::Mat mask = cv::Mat::zeros(input.size(), CV_8U);
+
+            // for (cv::Point& p : contours[idx])
+            // {
+            //     p.x += ImageCrop.x;
+            //     p.y += ImageCrop.y;
+            // }
+
+            cv::drawContours(mask, contours, idx, cv::Scalar(255), -1);
+            // cv::drawContours(contourImage, contours, idx, cv::Scalar(255));
+            // input.copyTo(maskedInput, mask);
+            cv::bitwise_or(input, result, result, mask);
+            // return maskedInput;
         }
         
-        return contourImage;
+        return result;
     }
 };

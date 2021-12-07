@@ -4,6 +4,7 @@
 
 #include "EOCVDummy.h"
 #include "Pipelines/BarcodePipeline.h"
+#include "Pipelines/PositioningPipeline.h"
 
 
 int main(int argc, char** argv)
@@ -26,7 +27,7 @@ int main(int argc, char** argv)
     }
 
     // Attach a processing pipeline to the camera
-    EOCVPipeline* pipeline = new BarcodePipeline();
+    EOCVPipeline* pipeline = new PositioningPipeline();
     cam.setPipeline(pipeline);
 
     // Constantly apply pipeline to incoming frames and display the result
