@@ -4,7 +4,7 @@
 class PositioningPipeline : public EOCVPipeline
 {
 public:    
-    PositioningPipeline() {name = "Barcode Pipeline";}
+    PositioningPipeline() {name = "Positioning Pipeline";}
 
 
     cv::Mat processFrame(cv::Mat input)
