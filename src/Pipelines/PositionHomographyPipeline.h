@@ -49,7 +49,7 @@ public:
         std::cout << goodMatches.size() << std::endl;
         cv::drawMatches(img1, kp1, input, kp2, goodMatches, output);
             
-        // input.copyTo(output);
+        input.copyTo(output);
 
         if (goodMatches.size() > 10)
         {
@@ -83,7 +83,15 @@ public:
             line(output, scene_corners[0], scene_corners[1], cv::Scalar(0, 255, 0), 4);
             line(output, scene_corners[1], scene_corners[2], cv::Scalar(0, 0, 255), 4);
             line(output, scene_corners[2], scene_corners[3], cv::Scalar(255, 0, 0), 4);
-            line(output, scene_corners[3], scene_corners[0], cv::Scalar(0, 255, 255), 4);    
+            line(output, scene_corners[3], scene_corners[0], cv::Scalar(0, 255, 255), 4);
+            cv::Mat x;
+            cv::warpPerspective(input, x, homography, img1.size(), cv::WARP_INVERSE_MAP);
+            cv::cvtColor(x, x, cv::COLOR_BGR2GRAY);
+
+            // cv::Mat trans_mat = (cv::Mat_<double>(2,3) << 1, 0, 15, 0, 1, 15);
+            // warpAffine(x, x, trans_mat, x.size());
+
+            cv::absdiff(img1, x, output);
         }
 
         // imshow("test", output);
